@@ -96,11 +96,29 @@
       border-left: 2px solid var(--accent);
     }
     .session-label {
-      flex: 1;
       min-width: 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+    .session-label-wrap {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow: hidden;
+    }
+    .limit-badge {
+      flex-shrink: 0;
+      font-size: 13px;
+      color: #e05252;
+      line-height: 1;
+      animation: pulse-badge 2s ease-in-out infinite;
+    }
+    @keyframes pulse-badge {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.45; }
     }
     .session-label-input {
       flex: 1;

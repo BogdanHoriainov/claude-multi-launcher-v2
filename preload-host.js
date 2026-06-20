@@ -47,9 +47,22 @@ window.hostAPI.onState((state) => {
     const item = document.createElement('div');
     item.className = 'session-item' + (p.id === state.selectedId ? ' active' : '');
 
+    const labelWrap = document.createElement('div');
+    labelWrap.className = 'session-label-wrap';
+
     const label = document.createElement('span');
     label.className = 'session-label';
     label.textContent = p.label;
+
+    labelWrap.appendChild(label);
+
+    if (p.limitReached) {
+      const badge = document.createElement('span');
+      badge.className = 'limit-badge';
+      badge.title = 'Токены закончились';
+      badge.textContent = '⚠';
+      labelWrap.appendChild(badge);
+    }
 
     const actions = document.createElement('div');
     actions.className = 'session-actions';
@@ -73,7 +86,7 @@ window.hostAPI.onState((state) => {
     actions.appendChild(rename);
     actions.appendChild(close);
 
-    item.appendChild(label);
+    item.appendChild(labelWrap);
     item.appendChild(actions);
     item.addEventListener('click', () => window.hostAPI.selectSession(p.id));
 

@@ -41,10 +41,32 @@ function injectOverlay() {
   document.body.appendChild(btn);
 }
 
+const LIMIT_PHRASES = [
+  'Upgrade to keep chatting',
+  'You are out of free messages until',
+];
+
+let limitReachedState = false;
+
+function checkLimitText() {
+  const bodyText = document.body ? document.body.innerText : '';
+  const reached = LIMIT_PHRASES.some((phrase) => bodyText.includes(phrase));
+  if (reached !== limitReachedState) {
+    limitReachedState = reached;
+    ipcRenderer.send('pane:limit-reached', reached);
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   injectOverlay();
-  const observer = new MutationObserver(injectOverlay);
-  observer.observe(document.body, { childList: true });
+
+  const observer = new MutationObserver(() => {
+    injectOverlay();
+    checkLimitText();
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+
+  checkLimitText();
 });
 
 ipcRenderer.on('pane-mode', (_event, mode) => {
