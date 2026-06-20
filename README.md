@@ -1,12 +1,61 @@
-const { contextBridge, ipcRenderer } = require('electron');
+# Claude Multi - лаунчер с несколькими окнами Claude
 
-contextBridge.exposeInMainWorld('hostAPI', {
-  createSession: () => ipcRenderer.send('host:create-session'),
-  selectSession: (id) => ipcRenderer.send('host:select-session', id),
-  closeSession: (id) => ipcRenderer.send('host:close-session', id),
-  renameSession: (id, label) => ipcRenderer.send('host:rename-session', { id, label }),
-  toggleSidebar: () => ipcRenderer.send('host:toggle-sidebar'),
-  onState: (callback) => {
-    ipcRenderer.on('host:state', (_event, state) => callback(state));
-  },
-});
+Electron-приложение для Windows, которое открывает произвольное число полностью независимых и постоянно залогиненных сессий [claude.ai](https://claude.ai) в одном окне. Каждая сессия хранится как отдельный профиль браузера
+
+## Как это работает
+
+- При первом запуске создаётся 5 окон, расположенных сеткой.
+- Кнопка **«+ Новое окно»** вверху добавляет ещё одну независимую сессию (потребуется один раз залогиниться именно в неё).
+- Пока окон **5 или меньше** - все видны одновременно сеткой.
+- Как только окон становится **больше 5** - слева появляется боковая панель: видно только одно выбранное окно на весь экран, остальные ждут в фоне с сохранённой сессией.
+
+## Установка и запуск
+
+1. Установить **Node.js LTS**: https://nodejs.org
+2. Скачать или распаковать папку `claude-multi-launcher` в удобное место.
+3. Открыть папку в терминале (например в VS Code или PowerShell).
+4. Перейти в папку с проектом:
+
+```
+cd Путь/к/папке/с/проектом
+```
+
+Пример:
+
+```
+cd Desktop/claude-multi-launcher
+```
+
+5. Установить зависимости:
+
+```
+npm install
+```
+
+6. Запустить приложение:
+
+```
+npm start
+```
+
+## Сборка .exe с ярлыком на рабочий стол
+
+```
+npm run dist
+```
+
+В папке `dist` появится установщик `Claude Multi Setup x.x.x.exe`. После установки на рабочем столе будет ярлык **Claude Multi** — дальше запуск одним кликом, все сессии сохранены.
+
+## Где хранятся сессии
+
+Cookies и данные каждого окна хранятся на диске в:
+
+```
+%APPDATA%\Claude Multi\Partitions\claude-session-N\
+```
+
+где `N` — номер сессии по порядку создания. Закрытие окна через ✕ убирает его из списка, но данные на диске остаются. Чтобы полностью стереть сессию — вручную удалите соответствующую подпапку.
+
+## Полностью разлогиниться
+
+Перед удалением приложения рекомендуется зайти в каждое окно и выполнить **Settings → Account → Log Out** в самом Claude — это закрывает сессию на сервере, а не только локально.
